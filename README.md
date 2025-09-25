@@ -8,7 +8,7 @@ An interactive educational tool built with React to demonstrate the **Shortest R
 
 This animation shows the SRTF algorithm in action, visualizing the preemption process as new jobs with shorter burst times arrive in the ready queue.
 
-![SRTF Visualizer Screenshot](placeholder.png)
+![SRTF Visualizer Screenshot]("SRTF Visualizer Screenshot.jpg")
 
 *A full screen recording of the project is available in the file: `Group 16_Screen Recording.mp4`*
 
