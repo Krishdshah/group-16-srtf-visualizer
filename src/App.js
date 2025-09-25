@@ -3,8 +3,10 @@ import ProcessTable from './components/ProcessTable';
 import GanttChart from './components/GanttChart';
 import Controls from './components/Controls';
 import Metrics from './components/Metrics';
+import DeveloperPage from './components/DeveloperPage'; // Import the new component
 import './App.css';
 
+// Initial data for the processes
 const initialProcesses = [
   { id: 1, arrivalTime: 0, burstTime: 8, priority: 0, color: '#ffadad' },
   { id: 2, arrivalTime: 1, burstTime: 4, priority: 0, color: '#ffd6a5' },
@@ -13,6 +15,7 @@ const initialProcesses = [
 ];
 
 const App = () => {
+  // State variables for the simulation
   const [processes, setProcesses] = useState([]);
   const [time, setTime] = useState(0);
   const [currentProcessId, setCurrentProcessId] = useState(null);
@@ -21,6 +24,7 @@ const App = () => {
   const [isFinished, setIsFinished] = useState(false);
   const [log, setLog] = useState("Click 'Start' to begin the simulation.");
 
+  // Function to reset the simulation to its initial state
   const resetState = useCallback(() => {
     setProcesses(
       initialProcesses.map((p) => ({
@@ -39,19 +43,25 @@ const App = () => {
     setLog("Click 'Start' to begin the simulation.");
   }, []);
 
+  // Effect to initialize the state when the component mounts
   useEffect(() => {
     resetState();
   }, [resetState]);
 
+  // The main simulation logic effect
   useEffect(() => {
     if (!isRunning) return;
 
+    // Set up an interval to tick every 800ms
     const timer = setInterval(() => {
+      // Find processes that have arrived and are not yet completed
       let readyQueue = processes.filter(
         (p) => p.arrivalTime <= time && p.remainingTime > 0
       );
 
+      // If no process is ready to run
       if (readyQueue.length === 0) {
+        // Check if all processes are finished
         if (processes.every((p) => p.remainingTime === 0)) {
           setIsRunning(false);
           setIsFinished(true);
@@ -59,15 +69,18 @@ const App = () => {
           setCurrentProcessId(null);
           clearInterval(timer);
         } else {
+          // If processes are yet to arrive, CPU is idle
           setLog(`CPU is idle at time ${time}.`);
           setTime((t) => t + 1);
         }
         return;
       }
 
+      // SRTF Logic: Sort the ready queue by the shortest remaining time
       readyQueue.sort((a, b) => a.remainingTime - b.remainingTime);
       const shortestJob = readyQueue[0];
 
+      // Check for preemption or start of a new process
       if (shortestJob.id !== currentProcessId) {
         setLog(
           `Time ${time}: Process P${shortestJob.id} preempts/starts (Remaining: ${shortestJob.remainingTime}).`
@@ -75,23 +88,26 @@ const App = () => {
         setCurrentProcessId(shortestJob.id);
       }
 
-      // Update Gantt Chart
+      // Update the Gantt Chart data
       setGanttChartData((prev) => {
           const lastBlock = prev[prev.length - 1];
+          // If the same process is running, extend its block
           if (lastBlock && lastBlock.processId === shortestJob.id) {
               lastBlock.end = time + 1;
               lastBlock.duration = lastBlock.end - lastBlock.start;
               return [...prev.slice(0, -1), lastBlock];
           } else {
+              // Otherwise, add a new block for the new process
               return [...prev, { processId: shortestJob.id, color: shortestJob.color, start: time, end: time + 1, duration: 1 }];
           }
       });
 
-      // Update process state
+      // Update the state of the running process
       setProcesses((prev) =>
         prev.map((p) => {
           if (p.id === shortestJob.id) {
             const newRemainingTime = p.remainingTime - 1;
+            // If the process finishes in this tick
             if (newRemainingTime === 0) {
               const completionTime = time + 1;
               const turnAroundTime = completionTime - p.arrivalTime;
@@ -99,15 +115,18 @@ const App = () => {
               setLog(`Time ${time + 1}: Process P${p.id} finished. 🏁`);
               return { ...p, remainingTime: 0, completionTime, turnAroundTime, waitingTime };
             }
+            // Otherwise, just decrement its remaining time
             return { ...p, remainingTime: newRemainingTime };
           }
           return p;
         })
       );
 
+      // Move time forward
       setTime((t) => t + 1);
     }, 800); // Animation speed: 800ms per time unit
 
+    // Cleanup function to clear the interval
     return () => clearInterval(timer);
   }, [isRunning, time, processes, currentProcessId]);
 
@@ -132,6 +151,10 @@ const App = () => {
           <GanttChart ganttChartData={ganttChartData} />
           <Metrics processes={processes} isFinished={isFinished} />
         </div>
+        
+        {/* Render the Developer Page component at the bottom */}
+        <DeveloperPage />
+
       </main>
     </div>
   );
