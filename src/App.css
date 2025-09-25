@@ -251,3 +251,42 @@ tr.highlighted {
   background-color: var(--primary-text);
   color: white;
 }
+
+/*
+--- Summary & Graph Section Styles ---
+*/
+
+.summary-section {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 30px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.graph-container {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  flex: 1;
+  min-width: 400px;
+  max-width: 600px;
+}
+
+.graph-container h3 {
+  color: var(--primary-text);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-family: 'Roboto Mono', monospace;
+}
+
+/* Adjust Metrics container to fit in the new layout */
+.metrics-container {
+  max-width: 350px;
+  flex: 1;
+  align-self: stretch;
+}

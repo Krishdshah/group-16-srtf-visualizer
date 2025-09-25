@@ -3,7 +3,8 @@ import ProcessTable from './components/ProcessTable';
 import GanttChart from './components/GanttChart';
 import Controls from './components/Controls';
 import Metrics from './components/Metrics';
-import DeveloperPage from './components/DeveloperPage'; // Import the new component
+import DeveloperPage from './components/DeveloperPage'; 
+import PerformanceGraph from './components/PerformanceGraph';
 import './App.css';
 
 // Initial data for the processes
@@ -147,10 +148,16 @@ const App = () => {
           <p><strong>Current Time: {time}</strong> | {log}</p>
         </div>
         <div className="content-wrapper">
-          <ProcessTable processes={processes} currentProcessId={currentProcessId} />
-          <GanttChart ganttChartData={ganttChartData} />
+        <ProcessTable processes={processes} currentProcessId={currentProcessId} />
+        <GanttChart ganttChartData={ganttChartData} />
+
+        {/* --- NEW SUMMARY SECTION FOR METRICS AND GRAPH --- */}
+        <div className="summary-section">
           <Metrics processes={processes} isFinished={isFinished} />
+          <PerformanceGraph processes={processes} isFinished={isFinished} />
         </div>
+
+      </div>
         
         {/* Render the Developer Page component at the bottom */}
         <DeveloperPage />
